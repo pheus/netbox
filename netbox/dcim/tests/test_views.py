@@ -3522,10 +3522,10 @@ class FrontPortTestCase(ViewTestCases.DeviceComponentViewTestCase):
         }
 
         cls.csv_data = (
-            "device,name,type,positions",
-            "Device 1,Front Port 4,8p8c,1",
-            "Device 1,Front Port 5,8p8c,1",
-            "Device 1,Front Port 6,8p8c,1",
+            "device,name,type,positions,rear_port,rear_port_position",
+            "Device 1,Front Port 4,8p8c,1,Rear Port 4,1",
+            "Device 1,Front Port 5,8p8c,1,Rear Port 5,1",
+            "Device 1,Front Port 6,8p8c,1,Rear Port 6,1",
         )
 
         cls.csv_update_data = (
@@ -3534,6 +3534,49 @@ class FrontPortTestCase(ViewTestCases.DeviceComponentViewTestCase):
             f"{front_ports[1].pk},Front Port 8,New description8",
             f"{front_ports[2].pk},Front Port 9,New description9",
         )
+
+    def test_bulk_import_objects_with_permission(self):
+        # Importing front ports with a rear_port (and position) should create the corresponding PortMapping
+        def check_port_mappings(scenario_name):
+            front_port = FrontPort.objects.get(name='Front Port 4')
+            mapping = PortMapping.objects.get(front_port=front_port)
+            self.assertEqual(mapping.rear_port.name, 'Rear Port 4')
+            self.assertEqual(mapping.front_port_position, 1)
+            self.assertEqual(mapping.rear_port_position, 1)
+
+        super().test_bulk_import_objects_with_permission(post_import_callback=check_port_mappings)
+
+    @override_settings(EXEMPT_VIEW_PERMISSIONS=['*'], EXEMPT_EXCLUDE_MODELS=[])
+    def test_bulk_import_rear_port_position_exceeds_capacity(self):
+        # A rear_port_position beyond the rear port's capacity is rejected without creating the front port
+        self.add_permissions('dcim.add_frontport')
+        csv_data = (
+            "device,name,type,positions,rear_port,rear_port_position",
+            "Device 1,Front Port 10,8p8c,1,Rear Port 4,2",
+        )
+        response = self.client.post(self._get_url('bulk_import'), {
+            'data': '\n'.join(csv_data),
+            'format': ImportFormatChoices.CSV,
+            'csv_delimiter': CSVDelimiterChoices.AUTO,
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(FrontPort.objects.filter(name='Front Port 10').exists())
+
+    @override_settings(EXEMPT_VIEW_PERMISSIONS=['*'], EXEMPT_EXCLUDE_MODELS=[])
+    def test_bulk_import_rear_port_position_occupied(self):
+        # An already-occupied rear port position is rejected (rather than raising an IntegrityError)
+        self.add_permissions('dcim.add_frontport')
+        csv_data = (
+            "device,name,type,positions,rear_port,rear_port_position",
+            "Device 1,Front Port 10,8p8c,1,Rear Port 1,1",
+        )
+        response = self.client.post(self._get_url('bulk_import'), {
+            'data': '\n'.join(csv_data),
+            'format': ImportFormatChoices.CSV,
+            'csv_delimiter': CSVDelimiterChoices.AUTO,
+        })
+        self.assertEqual(response.status_code, 200)
+        self.assertFalse(FrontPort.objects.filter(name='Front Port 10').exists())
 
     def test_trace(self):
         self.add_permissions(
