@@ -29,7 +29,7 @@ from extras.choices import CustomFieldTypeChoices
 from extras.models import CustomField, TableConfig, Tag
 from netbox.graphql.scalars import BigInt, BigIntScalar
 from netbox.graphql.schema import Query, get_schema_extensions, schema
-from users.models import Token
+from users.models import Token, User
 from utilities.tables import get_table_for_model
 from utilities.testing import APITestCase, APIViewTestCases, TestCase, disable_warnings
 
@@ -675,6 +675,26 @@ class GraphQLDeferredColumnTestCase(APITestCase):
             for i in range(cls.OBJECT_COUNT)
         ])
 
+        # Rack reservations, for RackReservationType.unit_count. Reservations within a rack may not claim
+        # overlapping units, so each is allocated a distinct run of them. The length of each run varies so
+        # that unit_count is asserted per object rather than against a single expected value.
+        rack = Rack.objects.create(name='Rack 1', site=site)
+        user = User.objects.create(username='Reservation user')
+        reservations, next_unit = [], 1
+        for i in range(cls.OBJECT_COUNT):
+            unit_count = i % 3 + 1
+            reservations.append(RackReservation(
+                rack=rack,
+                units=list(range(next_unit, next_unit + unit_count)),
+                user=user,
+                description=f'Reservation {i}',
+            ))
+            next_unit += unit_count
+        cls.expected_unit_counts = {
+            reservation.pk: len(reservation.units)
+            for reservation in RackReservation.objects.bulk_create(reservations)
+        }
+
     def _execute(self, query):
         url = reverse('graphql')
         with CaptureQueriesContext(connection) as context:
@@ -739,6 +759,28 @@ class GraphQLDeferredColumnTestCase(APITestCase):
                 self.assertIn(device['custom_fields']['cf1'], expected_values)
 
         self.assertNoDeferredColumnReloads(query, 'device_list', 'dcim_device', validate)
+
+    def test_rack_reservation_unit_count(self):
+        """
+        Regression test for #22822: RackReservationType.unit_count must not defer `units`.
+        """
+        self.add_permissions('dcim.view_rackreservation')
+        query = """
+        {
+            rack_reservation_list(pagination: {limit: %(limit)s}) {
+                id
+                unit_count
+            }
+        }
+        """
+
+        def validate(reservations):
+            for reservation in reservations:
+                self.assertEqual(
+                    reservation['unit_count'], self.expected_unit_counts[int(reservation['id'])]
+                )
+
+        self.assertNoDeferredColumnReloads(query, 'rack_reservation_list', 'dcim_rackreservation', validate)
 
 
 class GraphQLSchemaCoverageTestCase(APIViewTestCases.GraphQLSchemaCoverageTestCase):
