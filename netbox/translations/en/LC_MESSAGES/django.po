@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-29 05:58+0000\n"
+"POT-Creation-Date: 2026-07-30 05:52+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -401,7 +401,7 @@ msgstr ""
 #: netbox/dcim/forms/bulk_edit.py:142 netbox/dcim/forms/filtersets.py:227
 #: netbox/dcim/forms/model_forms.py:144 netbox/dcim/tables/sites.py:74
 #: netbox/ipam/models/asns.py:164 netbox/ipam/tables/asn.py:37
-#: netbox/ipam/tables/ip.py:126 netbox/ipam/views.py:383
+#: netbox/ipam/tables/ip.py:126 netbox/ipam/views.py:384
 #: netbox/netbox/navigation/menu.py:189 netbox/netbox/navigation/menu.py:192
 msgid "ASNs"
 msgstr ""
@@ -5949,7 +5949,7 @@ msgstr ""
 
 #: netbox/dcim/forms/object_create.py:312 netbox/dcim/tables/devices.py:1160
 #: netbox/ipam/tables/fhrp.py:31 netbox/ipam/ui/panels.py:185
-#: netbox/ipam/views.py:1589 netbox/templates/dcim/virtualchassis_edit.html:59
+#: netbox/ipam/views.py:1594 netbox/templates/dcim/virtualchassis_edit.html:59
 #: netbox/users/views.py:375
 msgid "Members"
 msgstr ""
@@ -7782,8 +7782,8 @@ msgstr ""
 
 #: netbox/dcim/tables/devices.py:597 netbox/dcim/views.py:3402
 #: netbox/ipam/forms/model_forms.py:834 netbox/ipam/tables/fhrp.py:28
-#: netbox/ipam/ui/panels.py:252 netbox/ipam/views.py:922
-#: netbox/ipam/views.py:1047 netbox/netbox/navigation/menu.py:175
+#: netbox/ipam/ui/panels.py:252 netbox/ipam/views.py:924
+#: netbox/ipam/views.py:1052 netbox/netbox/navigation/menu.py:175
 #: netbox/netbox/navigation/menu.py:177 netbox/vpn/tables/tunnels.py:98
 msgid "IP Addresses"
 msgstr ""
@@ -8210,7 +8210,7 @@ msgstr ""
 
 #: netbox/dcim/views.py:3414 netbox/ipam/forms/filtersets.py:469
 #: netbox/ipam/models/vlans.py:308 netbox/ipam/tables/ip.py:121
-#: netbox/ipam/tables/vlans.py:52 netbox/ipam/views.py:1381
+#: netbox/ipam/tables/vlans.py:52 netbox/ipam/views.py:1386
 #: netbox/netbox/navigation/menu.py:210 netbox/netbox/navigation/menu.py:212
 msgid "VLANs"
 msgstr ""
@@ -11037,11 +11037,11 @@ msgstr ""
 msgid "Ports"
 msgstr ""
 
-#: netbox/ipam/forms/bulk_import.py:55 netbox/ipam/views.py:72
+#: netbox/ipam/forms/bulk_import.py:55 netbox/ipam/views.py:73
 msgid "Import route targets"
 msgstr ""
 
-#: netbox/ipam/forms/bulk_import.py:61 netbox/ipam/views.py:75
+#: netbox/ipam/forms/bulk_import.py:61 netbox/ipam/views.py:76
 msgid "Export route targets"
 msgstr ""
 
@@ -11852,8 +11852,8 @@ msgid "Added"
 msgstr ""
 
 #: netbox/ipam/tables/ip.py:76 netbox/ipam/tables/ip.py:111
-#: netbox/ipam/tables/vlans.py:125 netbox/ipam/views.py:621
-#: netbox/ipam/views.py:1731 netbox/netbox/navigation/menu.py:182
+#: netbox/ipam/tables/vlans.py:125 netbox/ipam/views.py:623
+#: netbox/ipam/views.py:1736 netbox/netbox/navigation/menu.py:182
 #: netbox/netbox/navigation/menu.py:184
 msgid "Prefixes"
 msgstr ""
@@ -12054,76 +12054,76 @@ msgid ""
 "are allowed in DNS names"
 msgstr ""
 
-#: netbox/ipam/views.py:106 netbox/ipam/views.py:1761
+#: netbox/ipam/views.py:107 netbox/ipam/views.py:1766
 msgid "Device Interfaces"
 msgstr ""
 
-#: netbox/ipam/views.py:111 netbox/ipam/views.py:1779
+#: netbox/ipam/views.py:112 netbox/ipam/views.py:1784
 msgid "VM Interfaces"
 msgstr ""
 
-#: netbox/ipam/views.py:196
+#: netbox/ipam/views.py:197
 msgid "Importing VRFs"
 msgstr ""
 
-#: netbox/ipam/views.py:203
+#: netbox/ipam/views.py:204
 msgid "Exporting VRFs"
 msgstr ""
 
-#: netbox/ipam/views.py:212
+#: netbox/ipam/views.py:213
 msgid "Importing L2VPNs"
 msgstr ""
 
-#: netbox/ipam/views.py:219
+#: netbox/ipam/views.py:220
 msgid "Exporting L2VPNs"
 msgstr ""
 
-#: netbox/ipam/views.py:798
+#: netbox/ipam/views.py:800
 msgid "Duplicate prefixes"
 msgstr ""
 
-#: netbox/ipam/views.py:799 netbox/ipam/views.py:1012 netbox/ipam/views.py:1120
+#: netbox/ipam/views.py:801 netbox/ipam/views.py:1017 netbox/ipam/views.py:1125
 msgid "Parent prefixes"
 msgstr ""
 
-#: netbox/ipam/views.py:851
+#: netbox/ipam/views.py:853
 msgid "Child Prefixes"
 msgstr ""
 
-#: netbox/ipam/views.py:895
+#: netbox/ipam/views.py:897
 msgid "Child Ranges"
 msgstr ""
 
-#: netbox/ipam/views.py:1121
+#: netbox/ipam/views.py:1126
 msgid "Duplicate IPs"
 msgstr ""
 
-#: netbox/ipam/views.py:1125
+#: netbox/ipam/views.py:1130
 msgid "Application services"
 msgstr ""
 
-#: netbox/ipam/views.py:1291
+#: netbox/ipam/views.py:1296
 msgid "Related IPs"
 msgstr ""
 
-#: netbox/ipam/views.py:1432
+#: netbox/ipam/views.py:1437
 msgid "VLAN translation rules"
 msgstr ""
 
-#: netbox/ipam/views.py:1438
+#: netbox/ipam/views.py:1443
 msgid "Add Rule"
 msgstr ""
 
-#: netbox/ipam/views.py:1580
+#: netbox/ipam/views.py:1585
 msgid "Virtual IP addresses"
 msgstr ""
 
-#: netbox/ipam/views.py:1585 netbox/templates/ipam/iprange/ip_addresses.html:8
+#: netbox/ipam/views.py:1590 netbox/templates/ipam/iprange/ip_addresses.html:8
 #: netbox/templates/ipam/prefix/ip_addresses.html:7
 msgid "Add IP Address"
 msgstr ""
 
-#: netbox/ipam/views.py:1744
+#: netbox/ipam/views.py:1749
 msgid "Add a Prefix"
 msgstr ""
 
@@ -13496,7 +13496,7 @@ msgstr ""
 msgid "Synced {count} {object_type}"
 msgstr ""
 
-#: netbox/netbox/views/generic/object_views.py:118
+#: netbox/netbox/views/generic/object_views.py:120
 #, python-brace-format
 msgid "{class_name} must implement get_children()"
 msgstr ""
