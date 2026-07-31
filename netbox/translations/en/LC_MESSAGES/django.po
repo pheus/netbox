@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-07-30 05:52+0000\n"
+"POT-Creation-Date: 2026-07-31 06:00+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -230,30 +230,30 @@ msgstr ""
 
 #: netbox/circuits/filtersets.py:107 netbox/circuits/filtersets.py:137
 #: netbox/circuits/filtersets.py:175 netbox/circuits/filtersets.py:365
-#: netbox/circuits/filtersets.py:436 netbox/circuits/filtersets.py:517
-#: netbox/circuits/filtersets.py:596 netbox/ipam/filtersets.py:284
+#: netbox/circuits/filtersets.py:441 netbox/circuits/filtersets.py:522
+#: netbox/circuits/filtersets.py:601 netbox/ipam/filtersets.py:284
 msgid "Provider (ID)"
 msgstr ""
 
 #: netbox/circuits/filtersets.py:114 netbox/circuits/filtersets.py:144
 #: netbox/circuits/filtersets.py:182 netbox/circuits/filtersets.py:372
-#: netbox/circuits/filtersets.py:524 netbox/circuits/filtersets.py:603
+#: netbox/circuits/filtersets.py:529 netbox/circuits/filtersets.py:608
 #: netbox/ipam/filtersets.py:290
 msgid "Provider (slug)"
 msgstr ""
 
-#: netbox/circuits/filtersets.py:188 netbox/circuits/filtersets.py:530
-#: netbox/circuits/filtersets.py:609
+#: netbox/circuits/filtersets.py:188 netbox/circuits/filtersets.py:535
+#: netbox/circuits/filtersets.py:614
 msgid "Provider account (ID)"
 msgstr ""
 
-#: netbox/circuits/filtersets.py:195 netbox/circuits/filtersets.py:537
-#: netbox/circuits/filtersets.py:616
+#: netbox/circuits/filtersets.py:195 netbox/circuits/filtersets.py:542
+#: netbox/circuits/filtersets.py:621
 msgid "Provider account (account)"
 msgstr ""
 
-#: netbox/circuits/filtersets.py:200 netbox/circuits/filtersets.py:542
-#: netbox/circuits/filtersets.py:622
+#: netbox/circuits/filtersets.py:200 netbox/circuits/filtersets.py:547
+#: netbox/circuits/filtersets.py:627
 msgid "Provider network (ID)"
 msgstr ""
 
@@ -289,7 +289,7 @@ msgid "Termination A (ID)"
 msgstr ""
 
 #: netbox/circuits/filtersets.py:295 netbox/circuits/filtersets.py:405
-#: netbox/circuits/filtersets.py:580 netbox/core/filtersets.py:91
+#: netbox/circuits/filtersets.py:585 netbox/core/filtersets.py:91
 #: netbox/core/filtersets.py:179 netbox/core/filtersets.py:205
 #: netbox/core/filtersets.py:248 netbox/dcim/filtersets.py:926
 #: netbox/dcim/filtersets.py:1760 netbox/dcim/filtersets.py:3041
@@ -343,43 +343,43 @@ msgstr ""
 msgid "ProviderNetwork (ID)"
 msgstr ""
 
-#: netbox/circuits/filtersets.py:411
+#: netbox/circuits/filtersets.py:416
 msgid "Circuit (CID)"
 msgstr ""
 
-#: netbox/circuits/filtersets.py:416
+#: netbox/circuits/filtersets.py:421
 msgid "Circuit (ID)"
 msgstr ""
 
-#: netbox/circuits/filtersets.py:421
+#: netbox/circuits/filtersets.py:426
 msgid "Virtual circuit (CID)"
 msgstr ""
 
-#: netbox/circuits/filtersets.py:426 netbox/dcim/filtersets.py:2336
+#: netbox/circuits/filtersets.py:431 netbox/dcim/filtersets.py:2336
 msgid "Virtual circuit (ID)"
 msgstr ""
 
-#: netbox/circuits/filtersets.py:431
+#: netbox/circuits/filtersets.py:436
 msgid "Provider (name)"
 msgstr ""
 
-#: netbox/circuits/filtersets.py:441
+#: netbox/circuits/filtersets.py:446
 msgid "Circuit group (ID)"
 msgstr ""
 
-#: netbox/circuits/filtersets.py:448
+#: netbox/circuits/filtersets.py:453
 msgid "Circuit group (slug)"
 msgstr ""
 
-#: netbox/circuits/filtersets.py:547
+#: netbox/circuits/filtersets.py:552
 msgid "Virtual circuit type (ID)"
 msgstr ""
 
-#: netbox/circuits/filtersets.py:554
+#: netbox/circuits/filtersets.py:559
 msgid "Virtual circuit type (slug)"
 msgstr ""
 
-#: netbox/circuits/filtersets.py:585 netbox/circuits/forms/bulk_edit.py:316
+#: netbox/circuits/filtersets.py:590 netbox/circuits/forms/bulk_edit.py:316
 #: netbox/circuits/forms/bulk_import.py:248
 #: netbox/circuits/forms/filtersets.py:384
 #: netbox/circuits/forms/filtersets.py:390
@@ -389,7 +389,7 @@ msgstr ""
 msgid "Virtual circuit"
 msgstr ""
 
-#: netbox/circuits/filtersets.py:628 netbox/dcim/filtersets.py:1572
+#: netbox/circuits/filtersets.py:633 netbox/dcim/filtersets.py:1572
 #: netbox/dcim/filtersets.py:2061 netbox/ipam/filtersets.py:680
 #: netbox/vpn/filtersets.py:117 netbox/vpn/filtersets.py:445
 msgid "Interface (ID)"
