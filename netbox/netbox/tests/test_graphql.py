@@ -18,6 +18,7 @@ from dcim.models import (
     Device,
     DeviceRole,
     DeviceType,
+    Interface,
     Location,
     Manufacturer,
     Rack,
@@ -33,6 +34,12 @@ from netbox.graphql.schema import Query, get_schema_extensions, schema
 from users.models import Token, User
 from utilities.tables import get_table_for_model
 from utilities.testing import APITestCase, APIViewTestCases, TestCase, disable_warnings
+
+
+def count_primary_table_queries(queries, table):
+    """Count queries that read from `table` as the primary relation (not only as a join)."""
+    pattern = re.compile(rf'FROM "{re.escape(table)}"')
+    return sum(1 for query_record in queries if pattern.search(query_record['sql']))
 
 
 class GraphQLTestCase(TestCase):
@@ -467,6 +474,149 @@ class GraphQLAPITestCase(APITestCase):
             tag_queries,
             2,
             msg=f'Expected batched tag prefetch, got {tag_queries} tag queries for 10 devices',
+        )
+
+    def test_graphql_ip_address_list_assigned_object(self):
+        """
+        Requesting assigned_object should batch prefetch related objects.
+        """
+        self.add_permissions('ipam.view_ipaddress', 'dcim.view_interface', 'dcim.view_device')
+
+        site = Site.objects.first()
+        manufacturer = Manufacturer.objects.create(name='Assigned Object Manufacturer', slug='assigned-object-mfg')
+        device_type = DeviceType.objects.create(
+            manufacturer=manufacturer,
+            model='Assigned Object Model',
+            slug='assigned-object-model',
+        )
+        device_role = DeviceRole.objects.create(name='Assigned Object Role', slug='assigned-object-role')
+        device = Device.objects.create(
+            name='Assigned Object Device',
+            site=site,
+            device_type=device_type,
+            role=device_role,
+        )
+        interface = Interface.objects.create(name='eth0', device=device, type='1000baset')
+        ip_addresses = IPAddress.objects.bulk_create([
+            IPAddress(address=f'192.0.2.{index}/24', assigned_object=interface)
+            for index in range(1, 6)
+        ])
+        ip_ids = json.dumps([str(ip.pk) for ip in ip_addresses])
+
+        query = f"""
+        {{
+            ip_address_list(filters: {{id: {{in_list: {ip_ids}}}}}) {{
+                address
+                assigned_object {{
+                    ... on InterfaceType {{
+                        name
+                        device {{
+                            name
+                        }}
+                    }}
+                }}
+            }}
+        }}
+        """
+        url = reverse('graphql')
+
+        with CaptureQueriesContext(connection) as context:
+            response = self.client.post(url, data={'query': query}, format='json', **self.header)
+
+        self.assertHttpStatus(response, status.HTTP_200_OK)
+        data = json.loads(response.content)
+        self.assertNotIn('errors', data)
+        self.assertEqual(len(data['data']['ip_address_list']), len(ip_addresses))
+
+        device_queries = count_primary_table_queries(context.captured_queries, 'dcim_device')
+        self.assertLessEqual(
+            device_queries,
+            2,
+            msg=f'Expected batched assigned_object prefetch, got {device_queries} device queries for 5 IP addresses',
+        )
+
+    def test_graphql_ip_address_list_assigned_object_nested_site(self):
+        """
+        Nested assigned_object selections should be optimized on the GFK prefetch queryset.
+        """
+        self.add_permissions(
+            'ipam.view_ipaddress',
+            'dcim.view_interface',
+            'dcim.view_device',
+            'dcim.view_site',
+        )
+
+        site = Site.objects.first()
+        manufacturer = Manufacturer.objects.create(
+            name='Nested Site Manufacturer',
+            slug='nested-site-mfg',
+        )
+        device_type = DeviceType.objects.create(
+            manufacturer=manufacturer,
+            model='Nested Site Model',
+            slug='nested-site-model',
+        )
+        device_role = DeviceRole.objects.create(name='Nested Site Role', slug='nested-site-role')
+        interfaces = []
+        for index in range(5):
+            device = Device.objects.create(
+                name=f'Nested Site Device {index}',
+                site=site,
+                device_type=device_type,
+                role=device_role,
+            )
+            interfaces.append(Interface.objects.create(
+                name=f'eth{index}',
+                device=device,
+                type='1000baset',
+            ))
+        ip_addresses = IPAddress.objects.bulk_create([
+            IPAddress(address=f'192.0.2.{index}/24', assigned_object=interfaces[index - 1])
+            for index in range(1, 6)
+        ])
+        ip_ids = json.dumps([str(ip.pk) for ip in ip_addresses])
+
+        query = f"""
+        {{
+            ip_address_list(filters: {{id: {{in_list: {ip_ids}}}}}) {{
+                address
+                assigned_object {{
+                    ... on InterfaceType {{
+                        name
+                        device {{
+                            name
+                            site {{
+                                name
+                            }}
+                        }}
+                    }}
+                }}
+            }}
+        }}
+        """
+        url = reverse('graphql')
+
+        with CaptureQueriesContext(connection) as context:
+            response = self.client.post(url, data={'query': query}, format='json', **self.header)
+
+        self.assertHttpStatus(response, status.HTTP_200_OK)
+        data = json.loads(response.content)
+        self.assertNotIn('errors', data)
+        self.assertEqual(len(data['data']['ip_address_list']), len(ip_addresses))
+        for ip_data in data['data']['ip_address_list']:
+            self.assertEqual(ip_data['assigned_object']['device']['site']['name'], site.name)
+
+        device_queries = count_primary_table_queries(context.captured_queries, 'dcim_device')
+        site_queries = count_primary_table_queries(context.captured_queries, 'dcim_site')
+        self.assertLessEqual(
+            device_queries,
+            2,
+            msg=f'Expected batched device prefetch, got {device_queries} device queries for 5 IP addresses',
+        )
+        self.assertLessEqual(
+            site_queries,
+            2,
+            msg=f'Expected optimized site join, got {site_queries} site queries for 5 IP addresses',
         )
 
     def test_offset_pagination(self):
