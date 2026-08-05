@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-04 05:56+0000\n"
+"POT-Creation-Date: 2026-08-05 05:54+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -8305,7 +8305,7 @@ msgstr ""
 msgid "The rendered template output."
 msgstr ""
 
-#: netbox/extras/api/serializers_/customfields.py:79
+#: netbox/extras/api/serializers_/customfields.py:80
 msgid "Changing the type of custom fields is not supported."
 msgstr ""
 
