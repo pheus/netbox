@@ -7,7 +7,7 @@ from django.db.models import QuerySet
 from django.test import TestCase, override_settings
 from django.urls import reverse
 
-from core.choices import ManagedFileRootPathChoices
+from core.choices import JobStatusChoices, ManagedFileRootPathChoices
 from core.models import DataSource, Job
 from extras.models import Script, ScriptModule
 from extras.validators import CustomValidator
@@ -43,7 +43,7 @@ class ScriptDeletionTestCase(TestCase):
                 object_type=object_type,
                 object_id=obj.pk,
                 name='testjob',
-                status='completed',
+                status=JobStatusChoices.STATUS_COMPLETED,
                 job_id=uuid.uuid4(),
                 data={'output': 'x' * 50},
             )
@@ -164,7 +164,7 @@ class ConfirmCollectorTestCase(TestCase):
         script = Script.objects.create(module=module, name=f'S{uuid.uuid4().hex[:8]}')
         ct = ContentType.objects.get_for_model(Script, for_concrete_model=False)
         Job.objects.bulk_create([
-            Job(object_type=ct, object_id=script.pk, name='j', status='completed',
+            Job(object_type=ct, object_id=script.pk, name='j', status=JobStatusChoices.STATUS_COMPLETED,
                 job_id=uuid.uuid4(), data={'output': 'x' * 50})
             for _ in range(count)
         ])
@@ -226,7 +226,10 @@ class ObjectDeleteViewCountsTestCase(ViewTestCase):
         script = Script.objects.create(module=module, name=f'S{uuid.uuid4().hex[:8]}')
         ct = ContentType.objects.get_for_model(Script, for_concrete_model=False)
         Job.objects.bulk_create([
-            Job(object_type=ct, object_id=script.pk, name='j', status='completed', job_id=uuid.uuid4())
+            Job(
+                object_type=ct, object_id=script.pk, name='j',
+                status=JobStatusChoices.STATUS_COMPLETED, job_id=uuid.uuid4(),
+            )
             for _ in range(50)
         ])
 
@@ -249,7 +252,10 @@ class ObjectDeleteViewCountsTestCase(ViewTestCase):
         script = Script.objects.create(module=module, name=f'S{uuid.uuid4().hex[:8]}')
         ct = ContentType.objects.get_for_model(Script, for_concrete_model=False)
         Job.objects.bulk_create([
-            Job(object_type=ct, object_id=script.pk, name='j', status='completed', job_id=uuid.uuid4())
+            Job(
+                object_type=ct, object_id=script.pk, name='j',
+                status=JobStatusChoices.STATUS_COMPLETED, job_id=uuid.uuid4(),
+            )
             for _ in range(50)
         ])
 

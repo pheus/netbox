@@ -464,7 +464,10 @@ def batch_delete_jobs(job_queryset):
     # Re-slice the queryset each iteration: it re-queries after each batch delete, so the
     # remaining set shrinks and the loop terminates (do not hoist this into a cursor).
     while pks := list(job_pks[:JOB_DELETE_BATCH_SIZE]):
-        Job.objects.filter(pk__in=pks).delete()
+        # only('pk'): the batch still can't fast-delete (a global pre_delete receiver forces
+        # per-instance signals), so each Job in the batch is instantiated. Loading just the PK
+        # avoids pulling the large data/log_entries payloads into those instances.
+        Job.objects.filter(pk__in=pks).only('pk').delete()
 
 
 class JobsMixin(models.Model):

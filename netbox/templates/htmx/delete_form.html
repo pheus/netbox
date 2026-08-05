@@ -30,7 +30,7 @@
                 {# High-cardinality relations (e.g. jobs) are summarized by count and are not #}
                 {# expandable, since their instances are intentionally not loaded (see #22812). #}
                 {% if instances.count_only %}
-                  <div class="accordion-button collapsed no-toggle" style="cursor: default;">
+                  <div class="accordion-button collapsed" style="cursor: default;">
                     {{ object_count }}
                     {% if object_count == 1 %}{{ model|meta:"verbose_name" }}{% else %}{{ model|meta:"verbose_name_plural" }}{% endif %}
                   </div>
