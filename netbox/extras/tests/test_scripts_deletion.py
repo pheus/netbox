@@ -199,6 +199,16 @@ class ConfirmCollectorTestCase(TestCase):
         self.assertEqual(list(wrapper), [])
         self.assertTrue(wrapper.count_only)
 
+    def test_confirm_collector_omits_jobs_when_none(self):
+        # A jobless object must not record a zero count, or the confirmation page would show a
+        # spurious "0 jobs" row (#22812 regression).
+        datasource = DataSource.objects.create(name='DS', type='local', source_url='/tmp/test')
+
+        collector = ConfirmCollector(using=router.db_for_write(DataSource))
+        collector.collect([datasource])
+
+        self.assertNotIn(Job, collector.generic_relation_counts)
+
 
 class ObjectDeleteViewCountsTestCase(ViewTestCase):
     """
@@ -258,3 +268,18 @@ class ObjectDeleteViewCountsTestCase(ViewTestCase):
         self.assertIsInstance(dependent_objects[Job], CountOnly)
         self.assertEqual(len(dependent_objects[Job]), 50)
         self.assertTrue(dependent_objects[Job].count_only)
+
+    def test_get_dependent_objects_omits_jobs_when_none(self):
+        from netbox.views.generic.object_views import ObjectDeleteView
+
+        # A module with no jobs must not produce a CountOnly(0) entry (#22812 regression).
+        module = ScriptModule.objects.create(
+            file_root=ManagedFileRootPathChoices.SCRIPTS,
+            file_path=f'test_{uuid.uuid4().hex[:8]}.py',
+        )
+
+        view = ObjectDeleteView()
+        view.queryset = ScriptModule.objects.all()
+        dependent_objects = view._get_dependent_objects(module)
+
+        self.assertNotIn(Job, dependent_objects)

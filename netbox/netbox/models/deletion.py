@@ -59,7 +59,12 @@ class ConfirmCollector(Collector):
         from core.models import Job
 
         if source is not None and getattr(objs, 'model', None) is Job:
-            self.generic_relation_counts[Job] = self.generic_relation_counts.get(Job, 0) + objs.count()
+            # Django calls this branch for the jobs relation even when there are none; only record
+            # a count when there are actually jobs, so jobless objects don't get a spurious
+            # "0 jobs" row on the delete-confirmation page.
+            count = objs.count()
+            if count:
+                self.generic_relation_counts[Job] = self.generic_relation_counts.get(Job, 0) + count
             return None
         return super().collect(objs, source=source, *args, **kwargs)
 
