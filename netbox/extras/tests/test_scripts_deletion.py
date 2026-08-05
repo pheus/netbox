@@ -90,6 +90,30 @@ class ScriptDeletionTestCase(TestCase):
         self.assertFalse(Script.objects.filter(pk=script.pk).exists())
         self.assertEqual(Job.objects.filter(object_type=self.script_ct, object_id=script.pk).count(), 0)
 
+    def test_delete_scriptmodule_batches_child_script_jobs(self):
+        # The reporter's actual path: a script is only removable via the UI by deleting its
+        # ScriptModule. The module's delete must batch the child Script's jobs.
+        module, script = self._create_script()
+        self._add_jobs(script, 5)
+
+        job_delete_calls = []
+        original_delete = QuerySet.delete
+
+        def counting_delete(qs, *args, **kwargs):
+            if qs.model is Job:
+                job_delete_calls.append(len(qs))
+            return original_delete(qs, *args, **kwargs)
+
+        with mock.patch('netbox.models.features.JOB_DELETE_BATCH_SIZE', 2):
+            with mock.patch.object(QuerySet, 'delete', counting_delete):
+                module.delete()
+
+        # 5 child-script jobs at a batch size of 2 => three batched deletes (2, 2, 1). The module
+        # has no jobs of its own, so JobsMixin.delete adds no further Job deletes.
+        self.assertEqual(job_delete_calls, [2, 2, 1])
+        self.assertFalse(Script.objects.filter(pk=script.pk).exists())
+        self.assertEqual(Job.objects.filter(object_type=self.script_ct, object_id=script.pk).count(), 0)
+
     def test_delete_datasource_deletes_jobs(self):
         datasource = DataSource.objects.create(name='DS', type='local', source_url='/tmp/test')
         self._add_jobs(datasource, 100)

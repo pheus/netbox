@@ -43,6 +43,7 @@ __all__ = (
     'NotificationsMixin',
     'SyncedDataMixin',
     'TagsMixin',
+    'batch_delete_jobs',
     'get_model_features',
     'has_feature',
     'model_is_public',
@@ -449,6 +450,23 @@ class NotificationsMixin(models.Model):
         abstract = True
 
 
+def batch_delete_jobs(job_queryset):
+    """
+    Delete the Jobs in `job_queryset` in JOB_DELETE_BATCH_SIZE chunks, so the caller never has
+    to load thousands of Job rows (each carrying potentially large data/log_entries payloads)
+    into memory at once. Callers are responsible for wrapping this in a transaction. As with the
+    prior cascade behavior, this bulk delete does not invoke Job.delete() and therefore does not
+    cancel the backing RQ job. See #22812.
+    """
+    from core.models import Job
+
+    job_pks = job_queryset.order_by('pk').values_list('pk', flat=True)
+    # Re-slice the queryset each iteration: it re-queries after each batch delete, so the
+    # remaining set shrinks and the loop terminates (do not hoist this into a cursor).
+    while pks := list(job_pks[:JOB_DELETE_BATCH_SIZE]):
+        Job.objects.filter(pk__in=pks).delete()
+
+
 class JobsMixin(models.Model):
     """
     Enables support for job results.
@@ -464,20 +482,12 @@ class JobsMixin(models.Model):
         abstract = True
 
     def delete(self, *args, **kwargs):
-        from core.models import Job
-
-        # Delete associated jobs in batches so the cascade never has to load thousands of
-        # Job rows (each carrying potentially large data/log_entries payloads) into memory
-        # at once. Wrapped in a transaction so that a failure in the parent delete rolls the
-        # job deletions back as well. As with the prior cascade behavior, this bulk delete does
-        # not invoke Job.delete() and therefore does not cancel the backing RQ job. See #22812.
+        # Delete associated jobs in batches so the cascade never has to load thousands of Job
+        # rows into memory at once. Wrapped in a transaction so that a failure in the parent
+        # delete rolls the job deletions back as well. See #22812.
         using = router.db_for_write(self.__class__, instance=self)
         with transaction.atomic(using=using):
-            job_pks = self.jobs.order_by('pk').values_list('pk', flat=True)
-            # Re-slice the queryset each iteration: it re-queries after each batch delete, so the
-            # remaining set shrinks and the loop terminates (do not hoist this into a cursor).
-            while pks := list(job_pks[:JOB_DELETE_BATCH_SIZE]):
-                Job.objects.filter(pk__in=pks).delete()
+            batch_delete_jobs(self.jobs)
             return super().delete(*args, **kwargs)
     delete.alters_data = True
 
