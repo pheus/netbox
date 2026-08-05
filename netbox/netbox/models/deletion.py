@@ -40,6 +40,11 @@ class ConfirmCollector(Collector):
     object can accumulate thousands of Jobs, each carrying large data/log_entries payloads;
     materializing them all just to render a confirmation page can exhaust memory (see #22812).
     Instead, the related Jobs are counted and recorded in `generic_relation_counts`.
+
+    This is intentionally specific to Job, the only high-cardinality GenericRelation in the
+    data model; it is not a general count-out over every GenericRelation. If another relation
+    ever needs the same treatment, extend the check in collect() (and the matching write-path
+    batching in JobsMixin/ScriptModule.delete) rather than assuming this already handles it.
     """
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
