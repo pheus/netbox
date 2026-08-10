@@ -151,6 +151,21 @@ class ScriptDeletionTestCase(TestCase):
         self.assertTrue(Script.objects.filter(pk=script.pk).exists())
         self.assertEqual(Job.objects.filter(object_type=self.script_ct, object_id=script.pk).count(), 10)
 
+    @override_settings(PROTECTION_RULES={'extras.script': [CustomValidator({'name': {'eq': ''}})]})
+    def test_delete_scriptmodule_rolls_back_child_jobs_on_failure(self):
+        # Same abort path via the module: the protection rule fires when the cascade pre_deletes
+        # the child Script, after ScriptModule.delete has already batch-deleted that script's jobs.
+        # The transaction must roll those job deletions back, leaving no orphaned partial state.
+        module, script = self._create_script()
+        self._add_jobs(script, 10)
+
+        with self.assertRaises(AbortRequest):
+            module.delete()
+
+        self.assertTrue(ScriptModule.objects.filter(pk=module.pk).exists())
+        self.assertTrue(Script.objects.filter(pk=script.pk).exists())
+        self.assertEqual(Job.objects.filter(object_type=self.script_ct, object_id=script.pk).count(), 10)
+
 
 class ConfirmCollectorTestCase(TestCase):
     """

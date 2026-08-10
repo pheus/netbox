@@ -120,7 +120,7 @@ class ScriptModule(PythonModuleMixin, JobsMixin, ManagedFile):
     def __str__(self):
         return self.python_name
 
-    def delete(self, *args, **kwargs):
+    def delete(self, using=None, *args, **kwargs):
         # Job is imported here rather than at module level to avoid a circular import
         # (core.models.jobs -> core.signals -> extras.events -> extras.models -> this module).
         from core.models import Job
@@ -129,17 +129,18 @@ class ScriptModule(PythonModuleMixin, JobsMixin, ManagedFile):
         # Django's collector would materialize every one of those Scripts' Jobs to delete them.
         # A module's scripts can accumulate thousands of jobs, exhausting memory. Batch-delete
         # the child Scripts' jobs up front, in a single queryset (no per-script loop), before
-        # delegating to the cascade. Wrapped in a transaction so a failure in the parent delete
-        # rolls these deletions back as well. See #22812.
-        using = router.db_for_write(self.__class__, instance=self)
+        # delegating to the cascade. The transaction rolls the job deletions back if the parent
+        # delete fails; note it does not cover ManagedFile.delete removing the file from disk,
+        # which happens before the DB delete and is not transactional. See #22812.
+        using = using or router.db_for_write(self.__class__, instance=self)
         with transaction.atomic(using=using):
             script_type = ContentType.objects.get_for_model(Script, for_concrete_model=False)
-            child_jobs = Job.objects.filter(
+            child_jobs = Job.objects.using(using).filter(
                 object_type=script_type,
                 object_id__in=self.scripts.values_list('pk', flat=True),
             )
             batch_delete_jobs(child_jobs)
-            return super().delete(*args, **kwargs)
+            return super().delete(using, *args, **kwargs)
     delete.alters_data = True
 
     @property
