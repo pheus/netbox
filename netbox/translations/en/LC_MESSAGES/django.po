@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-08-12 05:29+0000\n"
+"POT-Creation-Date: 2026-08-13 05:30+0000\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -4197,7 +4197,7 @@ msgstr ""
 #: netbox/extras/forms/model_forms.py:694
 #: netbox/extras/forms/model_forms.py:779
 #: netbox/extras/forms/model_forms.py:831 netbox/extras/ui/panels.py:103
-#: netbox/netbox/forms/bulk_import.py:27 netbox/netbox/forms/mixins.py:135
+#: netbox/netbox/forms/bulk_import.py:28 netbox/netbox/forms/mixins.py:135
 #: netbox/netbox/tables/columns.py:503
 #: netbox/templates/circuits/inc/circuit_termination.html:29
 #: netbox/templates/circuits/panels/circuit_circuit_termination.html:29
@@ -12530,13 +12530,13 @@ msgstr ""
 msgid "Remove tags"
 msgstr ""
 
-#: netbox/netbox/forms/bulk_import.py:31
+#: netbox/netbox/forms/bulk_import.py:32
 msgid ""
 "Tag slugs separated by commas, encased with double quotes (e.g. \"tag1,tag2,"
 "tag3\")"
 msgstr ""
 
-#: netbox/netbox/forms/bulk_import.py:79
+#: netbox/netbox/forms/bulk_import.py:105
 msgid "Name of the object's owner"
 msgstr ""
 
